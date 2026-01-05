@@ -34,7 +34,7 @@ export function StyleSelector() {
       </div>
 
       {/* 固定高度滚动区域 */}
-      <div className="h-64 md:h-[420px] overflow-y-auto overflow-x-hidden">
+      <div className="h-64 md:h-[380px] overflow-y-auto overflow-x-hidden">
         <div className="grid grid-cols-2 gap-3">
           {visualStyles.map((style) => (
             <div

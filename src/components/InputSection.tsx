@@ -85,7 +85,7 @@ export function InputSection() {
         <div className="relative group">
           <Textarea
             id="user-input"
-            placeholder="输入医学知识或科普内容..."
+            placeholder="粘贴文章或指令指令..."
             className="h-40 resize-none bg-muted/30 border-border/60 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}

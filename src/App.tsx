@@ -149,6 +149,17 @@ function App() {
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-5 space-y-5 md:space-y-6">
             {/* Input Section */}
             <InputSection />
+            {/* Fixed Bottom Button */}
+          <div className="p-2 md:p-2 bg-background shrink-0">
+            <Button
+              onClick={handleProcess}
+              disabled={isProcessing || !textContent.trim()}
+              className="w-full gap-2 py-3 shadow-sm"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isProcessing ? '生成中...' : '生成绘图信息'}
+            </Button>
+          </div>
 
             {/* Style Selector */}
             <StyleSelector />
@@ -163,17 +174,7 @@ function App() {
             </div>
           </div>
 
-          {/* Fixed Bottom Button */}
-          <div className="p-4 md:p-5 border-t border-border/60 bg-background shrink-0">
-            <Button
-              onClick={handleProcess}
-              disabled={isProcessing || !textContent.trim()}
-              className="w-full gap-2 py-3 shadow-sm"
-            >
-              <Sparkles className="h-4 w-4" />
-              {isProcessing ? '生成中...' : '生成绘图信息'}
-            </Button>
-          </div>
+          
         </aside>
 
         {/* Right Panel - Preview Area */}
