@@ -26,11 +26,11 @@ Nano Info 是一款可视化信息图生成工具。它内置了多种精心设�
 
 ### 截图预览
 
-<!-- 主界面截图 -->
-![主界面](./screenshots/main.png)
+**主界面**
+<img width="2324" height="1243" alt="image" src="https://github.com/user-attachments/assets/03be604f-4167-43a7-9d28-3b29c95bf4ab" />
 
-<!-- 模板预览 -->
-![模板选择](./screenshots/templates.png)
+
+**模板预览**
 
 
 ## 技术栈
