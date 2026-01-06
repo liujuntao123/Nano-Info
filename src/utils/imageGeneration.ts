@@ -38,7 +38,7 @@ async function callGeminiAPI(
     parts.push({
       inlineData: {
         data: params.referenceImage,
-        mimeType: 'image/jpg'
+        mimeType: 'image/jpeg'
       }
     })
   }
@@ -83,8 +83,14 @@ async function callGeminiAPI(
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
+    if (value) {
+      buffer += decoder.decode(value, { stream: true })
+    }
+    if (done) {
+      // 刷新 decoder 中剩余的数据
+      buffer += decoder.decode()
+      break
+    }
   }
 
   // 解析 SSE 事件，查找 result 事件
@@ -128,7 +134,7 @@ async function callOpenAIAPI(
     content.push({
       type: 'image_url',
       image_url: {
-        url: `data:image/jpg;base64,${params.referenceImage}`
+        url: `data:image/jpeg;base64,${params.referenceImage}`
       }
     })
   }
@@ -141,6 +147,12 @@ async function callOpenAIAPI(
         content: content
       }
     ],
+    generationConfig: {
+      imageConfig:{
+        aspectRatio: params.aspectRatio,
+        imageSize: params.resolution,
+      }
+    },
     stream: true,
     stream_options: {
       include_usage: true
@@ -172,8 +184,14 @@ async function callOpenAIAPI(
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
+    if (value) {
+      buffer += decoder.decode(value, { stream: true })
+    }
+    if (done) {
+      // 刷新 decoder 中剩余的数据
+      buffer += decoder.decode()
+      break
+    }
   }
 
   // 直接从原始响应中提取 base64 图片数据

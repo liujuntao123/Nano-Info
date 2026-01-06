@@ -24,7 +24,6 @@ export interface VisualStyle {
   name: string
   tag: string // 标签，用于模板列表显示，格式如 "tag1,tag2"
   preview: string // 预览图片链接
-  theme: string
   background: string
   visual_style: string
   word_style: string

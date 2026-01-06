@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import Zoom from 'react-medium-image-zoom'
-import 'react-medium-image-zoom/dist/styles.css'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip } from '@/components/ui/tooltip'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useAppStore } from '@/stores/useAppStore'
 import { getStyleById } from '@/data/visualStyles'
 import { generateImage } from '@/utils/imageGeneration'
@@ -27,6 +26,7 @@ export function ContentBlocksSection() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editingTitleIndex, setEditingTitleIndex] = useState<number | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   const selectedStyle = selectedStyleId ? getStyleById(selectedStyleId) : null
 
@@ -197,13 +197,12 @@ export function ContentBlocksSection() {
 
               {/* 内容显示 */}
               {block.showImage && block.generatedImage ? (
-                <Zoom>
-                  <img
-                    src={`data:image/jpg;base64,${block.generatedImage}`}
-                    alt={`生成的图像 ${index + 1}`}
-                    className="w-full h-full object-contain cursor-zoom-in"
-                  />
-                </Zoom>
+                <img
+                  src={`data:image/jpg;base64,${block.generatedImage}`}
+                  alt={`生成的图像 ${index + 1}`}
+                  className="w-full h-full object-contain cursor-zoom-in"
+                  onClick={() => setPreviewImage(block.generatedImage!)}
+                />
               ) : editingIndex === index ? (
                 <Textarea
                   value={block.text}
@@ -337,6 +336,15 @@ export function ContentBlocksSection() {
           请先选择视觉风格，然后才能复制完整提示词或生成图像
         </p>
       )}
+
+      {/* 图片预览 Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+        <DialogContent className="max-w-4xl p-2">
+          {previewImage && (
+            <img src={`data:image/jpg;base64,${previewImage}`} alt="预览" className="w-full h-auto rounded" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
