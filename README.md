@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# Nano Info
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个帮你快速生成精美信息图的小工具。
 
-Currently, two official plugins are available:
+## 项目简介
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Nano Info 是一款可视化信息图生成工具。它内置了多种精心设计的模板，让你能够轻松地将文字内容转化为好看的信息图。不需要复杂的操作，选好模板、输入内容，一键就能生成。
 
-## React Compiler
+## 亮点
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **12 种精美模板** - 内置多种风格各异的信息图模板
+- **简洁的配置界面** - 图像生成的各项参数一目了然，上手即用
+- **灵活的内容输入** - 支持直接输入文字，也可以上传 PDF、Word、TXT、Markdown 等文件
+- **Prompt 一键复制** - 生成的 Prompt 可以直接复制，方便粘贴到平台使用
 
-## Expanding the ESLint configuration
+### 截图预览
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+<!-- 主界面截图 -->
+![主界面](./screenshots/main.png)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+<!-- 模板预览 -->
+![模板选择](./screenshots/templates.png)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 技术栈
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- React 18 + TypeScript
+- Vite
+- Zustand (状态管理)
+- Tailwind CSS v4
+- Radix UI
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 本地开发
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+
+# 构建生产版本
+pnpm build
 ```

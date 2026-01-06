@@ -37,7 +37,6 @@ export function ContentBlocksSection() {
 
     const promptObj: Record<string, string> = {
       title: title || '',
-      theme: selectedStyle.theme,
       background: selectedStyle.background,
       visual_style: selectedStyle.visual_style,
       word_style: selectedStyle.word_style,
@@ -126,7 +125,8 @@ export function ContentBlocksSection() {
 
     const link = document.createElement('a')
     link.href = `data:image/png;base64,${block.generatedImage}`
-    link.download = `generated-image-${index + 1}.jpg`
+    const fileName = block.title || `generated-image-${index + 1}`
+    link.download = `${fileName}.png`
     link.click()
   }
 

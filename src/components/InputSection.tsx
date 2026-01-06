@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { useAppStore } from '@/stores/useAppStore'
 import type { InputMode } from '@/types'
-import { Upload } from 'lucide-react'
+import { Upload, X, FileText } from 'lucide-react'
 
 export function InputSection() {
   const {
@@ -95,6 +95,39 @@ export function InputSection() {
             {textContent.length} / 10000
           </div>
         </div>
+      ) : fileName ? (
+        <div className="flex items-center gap-2 p-2 border border-border/60 rounded-lg bg-muted/30">
+          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <FileText className="h-4 w-4 text-primary" />
+          </div>
+          <span className="text-xs text-foreground font-medium truncate flex-1">{fileName}</span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setFileName('')
+              setTextContent('')
+              if (fileInputRef.current) fileInputRef.current.value = ''
+            }}
+            className="w-6 h-6 rounded-md hover:bg-muted flex items-center justify-center flex-shrink-0 transition-colors"
+          >
+            <X className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-[11px] text-primary hover:text-primary/80 font-medium px-2 flex-shrink-0"
+          >
+            更换
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,.txt,.md"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
       ) : (
         <div
           className="border-2 border-dashed border-border/60 rounded-xl p-6 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
@@ -112,14 +145,8 @@ export function InputSection() {
           <div className="w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/10 transition-colors">
             <Upload className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
-          {fileName ? (
-            <p className="text-sm text-foreground font-medium">{fileName}</p>
-          ) : (
-            <>
-              <p className="text-sm text-foreground/80 mb-1">拖拽文件到此处，或点击上传</p>
-              <p className="text-[11px] text-muted-foreground">支持 PDF、Word、Markdown、TXT</p>
-            </>
-          )}
+          <p className="text-sm text-foreground/80 mb-1">拖拽文件到此处，或点击上传</p>
+          <p className="text-[11px] text-muted-foreground">支持 PDF、Word、Markdown、TXT</p>
         </div>
       )}
 
@@ -127,7 +154,7 @@ export function InputSection() {
         <div className="space-y-2">
           <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">文件内容预览</label>
           <Textarea
-            className="min-h-[100px] resize-y bg-muted/30 border-border/60 rounded-xl text-sm"
+            className="min-h-[100px] max-h-[100px] resize-y bg-muted/30 border-border/60 rounded-xl text-xs"
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
           />
