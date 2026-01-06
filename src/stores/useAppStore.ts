@@ -6,9 +6,9 @@ const initialState: AppState = {
   inputMode: 'input',
   textContent: '',
   fileName: null,
-  splitCount: 3,
+  splitCount: 1,
   aspectRatio: '1:1',
-  resolution: '2k',
+  resolution: '2K',
   isProcessing: false,
   contentBlocks: [],
   error: null,
@@ -17,13 +17,13 @@ const initialState: AppState = {
   apiConfig: {
     baseUrl: '',
     apiKey: '',
-    model: 'gpt-4o-mini',
+    model: '',
   },
   imageApiConfig: {
     baseUrl: '',
     apiKey: '',
-    model: 'gemini-2.0-flash-preview-image-generation',
-    provider: 'gemini',
+    model: 'gemini-3-pro-image',
+    provider: 'openai',
   },
   generatedPrompts: [],
 }

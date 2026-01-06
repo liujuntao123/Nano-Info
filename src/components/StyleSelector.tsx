@@ -27,7 +27,7 @@ export function StyleSelector() {
           <label htmlFor="useStyleReference" className="text-[11px] cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
             应用参考图
           </label>
-          <Tooltip content="应用参考图将使图片风格更加稳定和统一">
+          <Tooltip content="应用参考图将使图片风格更加稳定和统一，但会限制AI的想象力">
             <HelpCircle className="h-3 w-3 text-muted-foreground/60 cursor-help hover:text-muted-foreground transition-colors" />
           </Tooltip>
         </div>

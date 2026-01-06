@@ -3,9 +3,9 @@ import type { Resolution } from '@/types'
 import { cn } from '@/lib/utils'
 
 const resolutions: { value: Resolution; label: string }[] = [
-  { value: '1k', label: '1080P' },
-  { value: '2k', label: '2K' },
-  { value: '4k', label: '4K' },
+  { value: '1K', label: '1K' },
+  { value: '2K', label: '2K' },
+  { value: '4K', label: '4K' },
 ]
 
 export function ResolutionSelector() {

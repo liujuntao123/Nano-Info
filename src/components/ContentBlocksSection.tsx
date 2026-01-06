@@ -126,7 +126,7 @@ export function ContentBlocksSection() {
 
     const link = document.createElement('a')
     link.href = `data:image/png;base64,${block.generatedImage}`
-    link.download = `generated-image-${index + 1}.png`
+    link.download = `generated-image-${index + 1}.jpg`
     link.click()
   }
 
@@ -199,7 +199,7 @@ export function ContentBlocksSection() {
               {block.showImage && block.generatedImage ? (
                 <Zoom>
                   <img
-                    src={`data:image/png;base64,${block.generatedImage}`}
+                    src={`data:image/jpg;base64,${block.generatedImage}`}
                     alt={`生成的图像 ${index + 1}`}
                     className="w-full h-full object-contain cursor-zoom-in"
                   />
@@ -225,7 +225,7 @@ export function ContentBlocksSection() {
               <div className="group/title flex items-center gap-1 min-w-0">
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground font-medium tracking-wide">
-                    IMAGE #{String(index + 1).padStart(2, '0')}
+                    #{String(index + 1).padStart(2, '0')}
                   </p>
                   {editingTitleIndex === index ? (
                     <input

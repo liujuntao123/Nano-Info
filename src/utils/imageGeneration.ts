@@ -15,7 +15,7 @@ interface GenerateImageResult {
 
 function buildGeminiUrl(config: ImageAPIConfig): string {
   const baseUrl = config.baseUrl.replace(/\/$/, '')
-  return `${baseUrl}/models/${config.model}:generateContent?key=${config.apiKey}`
+  return `${baseUrl}/models/${config.model}:generateContent`
 }
 
 function buildOpenAIUrl(config: ImageAPIConfig): string {
@@ -38,7 +38,7 @@ async function callGeminiAPI(
     parts.push({
       inlineData: {
         data: params.referenceImage,
-        mimeType: 'image/png'
+        mimeType: 'image/jpg'
       }
     })
   }
@@ -51,9 +51,10 @@ async function callGeminiAPI(
       }
     ],
     generationConfig: {
-      responseModalities: ["TEXT", "IMAGE"],
-      aspectRatio: params.aspectRatio,
-      responseMimeType: 'image/png'
+      imageConfig:{
+        aspectRatio: params.aspectRatio,
+        imageSize: params.resolution,
+      }
     }
   }
 
@@ -127,7 +128,7 @@ async function callOpenAIAPI(
     content.push({
       type: 'image_url',
       image_url: {
-        url: `data:image/png;base64,${params.referenceImage}`
+        url: `data:image/jpg;base64,${params.referenceImage}`
       }
     })
   }

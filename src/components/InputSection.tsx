@@ -89,10 +89,10 @@ export function InputSection() {
             className="h-40 resize-none bg-muted/30 border-border/60 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
-            maxLength={2000}
+            maxLength={10000}
           />
           <div className="absolute bottom-3 right-3 text-[10px] text-muted-foreground font-mono">
-            {textContent.length} / 2000
+            {textContent.length} / 10000
           </div>
         </div>
       ) : (

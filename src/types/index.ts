@@ -5,7 +5,7 @@ export type InputMode = 'input' | 'upload'
 export type AspectRatio = '1:1' | '4:3' | '3:4' | '16:9' | '9:16'
 
 // 图像分辨率类型
-export type Resolution = '1k' | '2k' | '4k'
+export type Resolution = '1K' | '2K' | '4K'
 
 // 输入类型（用于 AI 工作流）
 export type InstructionType = '完整文章' | '简单指令'
