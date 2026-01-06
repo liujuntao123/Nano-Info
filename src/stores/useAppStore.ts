@@ -12,7 +12,7 @@ const initialState: AppState = {
   isProcessing: false,
   contentBlocks: [],
   error: null,
-  selectedStyleId: null,
+  selectedStyleId: 'hand-drawn-visual-notes',
   useStyleReference: false,
   apiConfig: {
     baseUrl: '',
