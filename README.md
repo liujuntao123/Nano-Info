@@ -32,6 +32,11 @@ Nano Info 是一款可视化信息图生成工具。它内置了多种精心设�
 
 **模板预览**
 
+| | | | |
+|:---:|:---:|:---:|:---:|
+| ![手绘视觉笔记](public/previews/hand-drawn-visual-notes.jpg) | ![现代矢量扁平](public/previews/modern-vector-flat.jpg) | ![黑色霓虹](public/previews/black-neon.jpg) | ![治愈日记](public/previews/healing-journal.jpg) |
+| ![专家白板](public/previews/expert-whiteboard.jpg) | ![纳瓦尔式模块手绘](public/previews/naval-modular.jpg) | ![黑板漫画](public/previews/blackboard-comic.jpg) | ![康奈尔笔记](public/previews/cornell-notes-stickers.jpg) |
+| ![国风绘本](public/previews/chinese-painting-style.jpg) | ![现代信息卡](public/previews/modern-info-card.jpg) | ![古籍纸张](public/previews/ancient-manuscript.jpg) | ![自然百科卡片](public/previews/natural-encyclopedia-card.jpg) |
 
 ## 技术栈
 
