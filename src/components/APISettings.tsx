@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAppStore } from '@/stores/useAppStore'
 import { Settings, Eye, EyeOff, Check, Image, MessageSquare } from 'lucide-react'
-import type { ImageAPIProvider } from '@/types'
+import type { ImageAPIProvider, TextAPIProvider } from '@/types'
 
 interface APISettingsProps {
   open: boolean
@@ -52,6 +52,23 @@ export function APISettings({ open, onOpenChange }: APISettingsProps) {
           </TabsList>
 
           <TabsContent value="text" className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="textProvider">Provider 类型</Label>
+              <select
+                id="textProvider"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={localConfig.provider}
+                onChange={(e) =>
+                  setLocalConfig({ ...localConfig, provider: e.target.value as TextAPIProvider })
+                }
+              >
+                <option value="openai">OpenAI</option>
+                <option value="gemini">Gemini</option>
+              </select>
+              <p className="text-xs text-muted-foreground">
+                Provider 类型决定 API URL 的拼接方式和请求格式
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="baseUrl">API Base URL</Label>
               <Input

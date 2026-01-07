@@ -18,6 +18,7 @@ const initialState: AppState = {
     baseUrl: '',
     apiKey: '',
     model: '',
+    provider: 'openai',
   },
   imageApiConfig: {
     baseUrl: '',

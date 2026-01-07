@@ -36,7 +36,11 @@ export interface APIConfig {
   baseUrl: string
   apiKey: string
   model: string
+  provider: TextAPIProvider
 }
+
+// 文本 API Provider 类型
+export type TextAPIProvider = 'openai' | 'gemini'
 
 // 图像生成 API Provider 类型
 export type ImageAPIProvider = 'openai' | 'gemini'

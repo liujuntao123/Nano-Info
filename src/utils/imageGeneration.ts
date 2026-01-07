@@ -3,7 +3,7 @@ import type { ImageAPIConfig } from '@/types'
 const isDev = import.meta.env.DEV
 
 function proxyUrl(url: string): string {
-  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`
+  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`   
 }
 
 interface GenerateImageParams {
@@ -21,7 +21,7 @@ interface GenerateImageResult {
 
 function buildGeminiUrl(config: ImageAPIConfig): string {
   const baseUrl = config.baseUrl.replace(/\/$/, '')
-  return `${baseUrl}/models/${config.model}:generateContent`
+  return `${baseUrl}/models/${config.model}:streamGenerateContent?alt=sse`
 }
 
 function buildOpenAIUrl(config: ImageAPIConfig): string {
@@ -56,7 +56,7 @@ async function callGeminiAPI(
         parts
       }
     ],
-    generationConfig: {
+    streamGenerateContent: {
       imageConfig:{
         aspectRatio: params.aspectRatio,
         imageSize: params.resolution,

@@ -70,6 +70,16 @@ export function determineInstructionType(
   return '完整文章'
 }
 
+function buildOpenAIUrl(config: APIConfig): string {
+  const baseUrl = config.baseUrl.replace(/\/$/, '')
+  return `${baseUrl}/chat/completions`
+}
+
+function buildGeminiUrl(config: APIConfig): string {
+  const baseUrl = config.baseUrl.replace(/\/$/, '')
+  return `${baseUrl}/models/${config.model}:streamGenerateContent?alt=sse`
+}
+
 async function parseSSEResponse(response: Response): Promise<string> {
   const reader = response.body?.getReader()
   if (!reader) {
@@ -116,11 +126,11 @@ function isSSEResponse(response: Response): boolean {
   )
 }
 
-export async function callAIWorkflow(
+async function callOpenAIAPI(
   config: APIConfig,
   input: AIWorkflowInput
-): Promise<AIContentBlock[]> {
-  const url = proxyUrl(`${config.baseUrl}/chat/completions`)
+): Promise<string> {
+  const url = proxyUrl(buildOpenAIUrl(config))
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -133,6 +143,7 @@ export async function callAIWorkflow(
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: buildUserPrompt(input) },
       ],
+      stream: true,
     }),
   })
 
@@ -145,14 +156,115 @@ export async function callAIWorkflow(
     )
   }
 
-  let content: string
-
   // 检查是否为 SSE 流式响应
   if (isSSEResponse(response)) {
-    content = await parseSSEResponse(response)
+    return await parseSSEResponse(response)
   } else {
     const data = await response.json()
-    content = data.choices?.[0]?.message?.content
+    return data.choices?.[0]?.message?.content || ''
+  }
+}
+
+async function callGeminiAPI(
+  config: APIConfig,
+  input: AIWorkflowInput
+): Promise<string> {
+  const url = proxyUrl(buildGeminiUrl(config))
+
+  const payload = {
+    systemInstruction: {
+      parts: [{ text: SYSTEM_PROMPT }]
+    },
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text: buildUserPrompt(input) }]
+      }
+    ]
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`API 请求失败: ${response.status} - ${errorText}`)
+  }
+
+  // 解析 SSE 流式响应
+  const reader = response.body?.getReader()
+  if (!reader) {
+    throw new Error('无法读取响应流')
+  }
+
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (value) {
+      buffer += decoder.decode(value, { stream: true })
+    }
+    if (done) {
+      buffer += decoder.decode()
+      break
+    }
+  }
+
+  // 解析 SSE 流式响应，拼接所有文本片段
+  const lines = buffer.split('\n')
+  let content = ''
+
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      try {
+        const data = JSON.parse(line.slice(6))
+        const textPart = data.candidates?.[0]?.content?.parts?.find(
+          (p: { text?: string }) => p.text
+        )
+        if (textPart?.text) {
+          content += textPart.text
+        }
+      } catch {
+        // 忽略解析错误
+      }
+    }
+  }
+
+  // 如果没有 SSE 事件格式，尝试直接解析 JSON 响应
+  if (!content) {
+    try {
+      const data = JSON.parse(buffer)
+      const textPart = data.candidates?.[0]?.content?.parts?.find(
+        (p: { text?: string }) => p.text
+      )
+      if (textPart?.text) {
+        content = textPart.text
+      }
+    } catch {
+      // 忽略解析错误
+    }
+  }
+
+  return content
+}
+
+export async function callAIWorkflow(
+  config: APIConfig,
+  input: AIWorkflowInput
+): Promise<AIContentBlock[]> {
+  let content: string
+
+  if (config.provider === 'gemini') {
+    content = await callGeminiAPI(config, input)
+  } else {
+    content = await callOpenAIAPI(config, input)
   }
 
   if (!content) {
