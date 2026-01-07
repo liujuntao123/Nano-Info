@@ -10,7 +10,7 @@ import { APISettings } from '@/components/APISettings'
 import { useAppStore } from '@/stores/useAppStore'
 import { parseFile } from '@/utils/fileParser'
 import { callAIWorkflow, determineInstructionType } from '@/utils/aiWorkflow'
-import { Settings, Sparkles, PanelLeftClose, PanelLeft, Github } from 'lucide-react'
+import { Settings, Sparkles, PanelLeftClose, PanelLeft, Github, FileText } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import type { ContentBlockState } from '@/types'
 
@@ -116,6 +116,20 @@ function App() {
           <span className="text-lg font-semibold tracking-tight">Nano Info</span>
         </div>
         <div className="flex items-center gap-1">
+          <a
+            href="https://t1728t6ifnr.feishu.cn/wiki/BoeXwzoKXiKcfekTJNGcjVUwnje?from=from_copylink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full text-muted-foreground hover:text-foreground"
+              title="使用教程"
+            >
+              <FileText className="h-4.5 w-4.5" />
+            </Button>
+          </a>
           <a
             href="https://github.com/liujuntao123/Nano-Info"
             target="_blank"
