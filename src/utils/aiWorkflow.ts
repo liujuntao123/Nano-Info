@@ -1,5 +1,11 @@
 import type { AIWorkflowInput, APIConfig, InstructionType } from '@/types'
 
+const isDev = import.meta.env.DEV
+
+function proxyUrl(url: string): string {
+  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`
+}
+
 // AI返回的内容块结构
 export interface AIContentBlock {
   title: string
@@ -114,7 +120,8 @@ export async function callAIWorkflow(
   config: APIConfig,
   input: AIWorkflowInput
 ): Promise<AIContentBlock[]> {
-  const response = await fetch(`${config.baseUrl}/chat/completions`, {
+  const url = proxyUrl(`${config.baseUrl}/chat/completions`)
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

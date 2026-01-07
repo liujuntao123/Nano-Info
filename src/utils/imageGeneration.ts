@@ -1,5 +1,11 @@
 import type { ImageAPIConfig } from '@/types'
 
+const isDev = import.meta.env.DEV
+
+function proxyUrl(url: string): string {
+  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`
+}
+
 interface GenerateImageParams {
   prompt: string
   aspectRatio: string
@@ -27,7 +33,7 @@ async function callGeminiAPI(
   config: ImageAPIConfig,
   params: GenerateImageParams
 ): Promise<GenerateImageResult> {
-  const url = buildGeminiUrl(config)
+  const url = proxyUrl(buildGeminiUrl(config))
 
   const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [
     { text: params.prompt }
@@ -122,7 +128,7 @@ async function callOpenAIAPI(
   config: ImageAPIConfig,
   params: GenerateImageParams
 ): Promise<GenerateImageResult> {
-  const url = buildOpenAIUrl(config)
+  const url = proxyUrl(buildOpenAIUrl(config))
 
   // 构建消息内容，支持参考图
   const content: Array<{ type: string; text?: string; image_url?: { url: string } }> = [
