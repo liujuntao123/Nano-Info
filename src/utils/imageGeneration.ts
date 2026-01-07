@@ -3,7 +3,8 @@ import type { ImageAPIConfig } from '@/types'
 const isDev = import.meta.env.DEV
 
 function proxyUrl(url: string): string {
-  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`   
+  // return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`   
+  return `https://nano-info.aizhi.site/proxy?url=${encodeURIComponent(url)}`   
 }
 
 interface GenerateImageParams {
@@ -99,26 +100,39 @@ async function callGeminiAPI(
     }
   }
 
-  // 解析 SSE 事件，查找 result 事件
+  // 解析 SSE 事件，查找图像数据
   const lines = buffer.split('\n')
   let currentEvent = ''
 
   for (const line of lines) {
     if (line.startsWith('event: ')) {
       currentEvent = line.slice(7).trim()
-    } else if (line.startsWith('data: ') && currentEvent === 'result') {
-      try {
-        const data = JSON.parse(line.slice(6))
-        const imagePart = data.candidates?.[0]?.content?.parts?.find(
-          (p: { inlineData?: { data: string } }) => p.inlineData
-        )
-        if (imagePart?.inlineData?.data) {
-          return { success: true, image: imagePart.inlineData.data }
+    } else if (line.startsWith('data: ')) {
+      // 优先处理 event: result 事件，也处理无 event 前缀的 data 行
+      if (currentEvent === 'result' || currentEvent === '' || currentEvent === 'message') {
+        try {
+          const dataStr = line.slice(6)
+          // 跳过 [DONE] 标记
+          if (dataStr.trim() === '[DONE]') continue
+
+          const data = JSON.parse(dataStr)
+          const imagePart = data.candidates?.[0]?.content?.parts?.find(
+            (p: { inlineData?: { data: string } }) => p.inlineData
+          )
+          if (imagePart?.inlineData?.data) {
+            return { success: true, image: imagePart.inlineData.data }
+          }
+        } catch {
+          // 忽略解析错误，可能是不完整的 JSON 或其他格式
         }
-      } catch {
-        // 忽略解析错误
       }
     }
+  }
+
+  // 兜底：尝试从整个 buffer 中提取 inlineData
+  const inlineDataMatch = buffer.match(/"inlineData"\s*:\s*\{\s*"data"\s*:\s*"([A-Za-z0-9+/=]+)"/)
+  if (inlineDataMatch?.[1]) {
+    return { success: true, image: inlineDataMatch[1] }
   }
 
   return { success: false, error: '未找到图像数据，请检查 API 响应' }

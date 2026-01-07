@@ -79,9 +79,6 @@ export function APISettings({ open, onOpenChange }: APISettingsProps) {
                   setLocalConfig({ ...localConfig, baseUrl: e.target.value })
                 }
               />
-              <p className="text-xs text-muted-foreground">
-                留空使用默认 OpenAI API，或输入自定义 URL
-              </p>
             </div>
 
             <div className="space-y-2">
