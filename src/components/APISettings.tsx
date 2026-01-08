@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAppStore } from '@/stores/useAppStore'
-import { Settings, Eye, EyeOff, Check, Image, MessageSquare } from 'lucide-react'
+import { Settings, Eye, EyeOff, Check, Image, MessageSquare, ExternalLink } from 'lucide-react'
 import type { ImageAPIProvider, TextAPIProvider } from '@/types'
 
 interface APISettingsProps {
@@ -34,10 +34,31 @@ export function APISettings({ open, onOpenChange }: APISettingsProps) {
             <Settings className="h-5 w-5" />
             API 配置
           </DialogTitle>
-          <DialogDescription>
-            配置文本生成和图像生成的 API 接口
+          <DialogDescription className="flex items-center justify-between">
+            <span>配置文本生成和图像生成的 API 接口</span>
+            <a
+              href="https://t1728t6ifnr.feishu.cn/wiki/BoeXwzoKXiKcfekTJNGcjVUwnje?from=from_copylink"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              <ExternalLink className="h-3 w-3" />
+              配置教程
+            </a>
           </DialogDescription>
         </DialogHeader>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
+        <ExternalLink className="h-3 w-3" />
+          <a
+            href="https://foxcode.rjj.cc/auth/register?aff=8LR7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            高性价比 API 站，聊天绘图一站搞定
+          </a>
+        </div>
 
         <Tabs defaultValue="text" className="w-full">
           <TabsList className="w-full">

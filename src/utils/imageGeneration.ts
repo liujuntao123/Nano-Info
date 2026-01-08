@@ -1,10 +1,9 @@
 import type { ImageAPIConfig } from '@/types'
 
 const isDev = import.meta.env.DEV
-
 function proxyUrl(url: string): string {
-  // return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`   
-  return `https://nano-info.aizhi.site/proxy?url=${encodeURIComponent(url)}`   
+  const prefix = 'https://nano-info.aizhi.site' 
+  return isDev ? `${prefix}/proxy?url=${encodeURIComponent(url)}` : `/proxy?url=${encodeURIComponent(url)}`
 }
 
 interface GenerateImageParams {
@@ -100,7 +99,7 @@ async function callGeminiAPI(
     }
   }
 
-  // 解析 SSE 事件，查找图像数据
+  // 尝试解析 SSE 事件，查找图像数据
   const lines = buffer.split('\n')
   let currentEvent = ''
 
@@ -129,7 +128,20 @@ async function callGeminiAPI(
     }
   }
 
-  // 兜底：尝试从整个 buffer 中提取 inlineData
+  // 兜底1：尝试直接解析为非流式 JSON 响应
+  try {
+    const data = JSON.parse(buffer)
+    const imagePart = data.candidates?.[0]?.content?.parts?.find(
+      (p: { inlineData?: { data: string } }) => p.inlineData
+    )
+    if (imagePart?.inlineData?.data) {
+      return { success: true, image: imagePart.inlineData.data }
+    }
+  } catch {
+    // 忽略解析错误
+  }
+
+  // 兜底2：尝试从整个 buffer 中提取 inlineData
   const inlineDataMatch = buffer.match(/"inlineData"\s*:\s*\{\s*"data"\s*:\s*"([A-Za-z0-9+/=]+)"/)
   if (inlineDataMatch?.[1]) {
     return { success: true, image: inlineDataMatch[1] }
@@ -214,10 +226,47 @@ async function callOpenAIAPI(
     }
   }
 
-  // 直接从原始响应中提取 base64 图片数据
+  // 尝试从 SSE 流式响应中提取 base64 图片数据
   const match = buffer.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/)
   if (match?.[1]) {
     return { success: true, image: match[1] }
+  }
+
+  // 尝试解析 SSE 流式响应（OpenAI 格式）
+  const lines = buffer.split('\n')
+  for (const line of lines) {
+    const trimmedLine = line.trim()
+    if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
+
+    if (trimmedLine.startsWith('data: ')) {
+      try {
+        const data = JSON.parse(trimmedLine.slice(6))
+        // 检查是否有图片 URL
+        const content = data.choices?.[0]?.delta?.content || data.choices?.[0]?.message?.content
+        if (content) {
+          const imgMatch = content.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/)
+          if (imgMatch?.[1]) {
+            return { success: true, image: imgMatch[1] }
+          }
+        }
+      } catch {
+        // 忽略解析错误
+      }
+    }
+  }
+
+  // 兜底：尝试直接解析为非流式 JSON 响应
+  try {
+    const data = JSON.parse(buffer)
+    const content = data.choices?.[0]?.message?.content
+    if (content) {
+      const imgMatch = content.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/)
+      if (imgMatch?.[1]) {
+        return { success: true, image: imgMatch[1] }
+      }
+    }
+  } catch {
+    // 忽略解析错误
   }
 
   return { success: false, error: '未找到图像数据' }

@@ -3,7 +3,8 @@ import type { AIWorkflowInput, APIConfig, InstructionType } from '@/types'
 const isDev = import.meta.env.DEV
 
 function proxyUrl(url: string): string {
-  return isDev ? url : `/proxy?url=${encodeURIComponent(url)}`
+  const prefix = 'https://nano-info.aizhi.site'
+  return isDev ? `${prefix}/proxy?url=${encodeURIComponent(url)}` : `/proxy?url=${encodeURIComponent(url)}`
 }
 
 // AI返回的内容块结构
@@ -80,51 +81,61 @@ function buildGeminiUrl(config: APIConfig): string {
   return `${baseUrl}/models/${config.model}:streamGenerateContent?alt=sse`
 }
 
-async function parseSSEResponse(response: Response): Promise<string> {
+async function parseOpenAIResponse(response: Response): Promise<string> {
   const reader = response.body?.getReader()
   if (!reader) {
     throw new Error('无法读取响应流')
   }
 
   const decoder = new TextDecoder()
-  let content = ''
+  let buffer = ''
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
+    if (value) {
+      buffer += decoder.decode(value, { stream: true })
+    }
+    if (done) {
+      buffer += decoder.decode()
+      break
+    }
+  }
 
-    const chunk = decoder.decode(value, { stream: true })
-    const lines = chunk.split('\n')
+  // 尝试按 SSE 流式格式解析
+  let content = ''
+  const lines = buffer.split('\n')
 
-    for (const line of lines) {
-      const trimmedLine = line.trim()
-      if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
+  for (const line of lines) {
+    const trimmedLine = line.trim()
+    if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
 
-      if (trimmedLine.startsWith('data: ')) {
-        try {
-          const jsonStr = trimmedLine.slice(6) // 移除 "data: " 前缀
-          const data = JSON.parse(jsonStr)
-          const delta = data.choices?.[0]?.delta?.content
-          if (delta) {
-            content += delta
-          }
-        } catch {
-          // 忽略解析失败的行
+    if (trimmedLine.startsWith('data: ')) {
+      try {
+        const jsonStr = trimmedLine.slice(6) // 移除 "data: " 前缀
+        const data = JSON.parse(jsonStr)
+        const delta = data.choices?.[0]?.delta?.content
+        if (delta) {
+          content += delta
         }
+      } catch {
+        // 忽略解析失败的行
       }
+    }
+  }
+
+  // 如果 SSE 解析没有内容，尝试直接解析为非流式 JSON 响应
+  if (!content) {
+    try {
+      const data = JSON.parse(buffer)
+      content = data.choices?.[0]?.message?.content || ''
+    } catch {
+      // 忽略解析错误
     }
   }
 
   return content
 }
 
-function isSSEResponse(response: Response): boolean {
-  const contentType = response.headers.get('content-type') || ''
-  return (
-    contentType.includes('text/event-stream') ||
-    contentType.includes('text/plain')
-  )
-}
 
 async function callOpenAIAPI(
   config: APIConfig,
@@ -156,13 +167,8 @@ async function callOpenAIAPI(
     )
   }
 
-  // 检查是否为 SSE 流式响应
-  if (isSSEResponse(response)) {
-    return await parseSSEResponse(response)
-  } else {
-    const data = await response.json()
-    return data.choices?.[0]?.message?.content || ''
-  }
+  // 统一解析响应（兼容流式和非流式）
+  return await parseOpenAIResponse(response)
 }
 
 async function callGeminiAPI(
