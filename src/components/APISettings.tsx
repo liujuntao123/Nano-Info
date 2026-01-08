@@ -56,7 +56,7 @@ export function APISettings({ open, onOpenChange }: APISettingsProps) {
             rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
-            高性价比 API 站，聊天绘图一站搞定
+            高性价比 API 站，聊天、绘图、编程一站搞定
           </a>
         </div>
 
