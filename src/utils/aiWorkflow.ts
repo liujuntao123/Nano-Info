@@ -30,7 +30,7 @@ word_count:撰写文章字数
 ## Step 1: 意图识别与内容创作
 - 如果\`instruction_type\`是简单指令，根据\`instruction\`撰写一篇\`word_count\`字的深度长文。得到文章\`ariticle\`。
 - 内容要求：逻辑严密，文章的理论和依据都符合事实。
-- 如果\`instruction_type\`是完整文章，则直接将原文流转到下一步。得到文章\`ariticle\`。
+- 如果\`instruction_type\`是"完整文章"，则不要做任何修改，直接将原文流转到下一步。得到文章\`ariticle\`。
 - 最终得到一篇文章：\`ariticle\`。
 
 ## Step 2: 内容预处理
@@ -65,7 +65,7 @@ export function determineInstructionType(
   content: string,
   inputMode: 'input' | 'upload'
 ): InstructionType {
-  if (inputMode === 'input' && content.trim().length < 200) {
+  if (inputMode === 'input' && content.trim().length < 100) {
     return '简单指令'
   }
   return '完整文章'

@@ -1,9 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/stores/useAppStore'
 import type { InputMode } from '@/types'
-import { Upload, X, FileText } from 'lucide-react'
+import { Upload, X, FileText, Link, ChevronUp, ChevronDown, Loader2 } from 'lucide-react'
 
 export function InputSection() {
   const {
@@ -16,6 +18,36 @@ export function InputSection() {
   } = useAppStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showWechatInput, setShowWechatInput] = useState(false)
+  const [wechatUrl, setWechatUrl] = useState('')
+  const [isParsingWechat, setIsParsingWechat] = useState(false)
+
+  const parseWechatArticle = async () => {
+    if (!wechatUrl.trim()) return
+
+    setIsParsingWechat(true)
+    try {
+      const response = await fetch('/parse-wechat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: wechatUrl.trim() }),
+      })
+
+      const result = await response.json()
+
+      if (result.success && result.data?.content) {
+        setTextContent(result.data.content)
+        setWechatUrl('')
+        setShowWechatInput(false)
+      } else {
+        alert(result.error || '解析失败')
+      }
+    } catch (error) {
+      alert('网络错误，请重试')
+    } finally {
+      setIsParsingWechat(false)
+    }
+  }
 
   const handleTabChange = (value: string) => {
     setInputMode(value as InputMode)
@@ -86,13 +118,24 @@ export function InputSection() {
           <Textarea
             id="user-input"
             placeholder="粘贴文章或指令指令..."
-            className="h-40 resize-none bg-muted/30 border-border/60 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            className="h-40 resize-none bg-muted/30 border-border/60 rounded-xl p-4 pb-10 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
-            maxLength={10000}
+            maxLength={20000}
           />
           <div className="absolute bottom-3 right-3 text-[10px] text-muted-foreground font-mono">
-            {textContent.length} / 10000
+            {textContent.length} / 20000
+          </div>
+          <div className="absolute bottom-2 left-2">
+            <button
+              type="button"
+              onClick={() => setShowWechatInput(!showWechatInput)}
+              className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors px-1.5 py-1 rounded hover:bg-muted/50"
+            >
+              <Link className="h-3 w-3" />
+              <span>微信文章</span>
+              {showWechatInput ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+            </button>
           </div>
         </div>
       ) : fileName ? (
@@ -158,6 +201,42 @@ export function InputSection() {
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
           />
+        </div>
+      )}
+
+      {showWechatInput && inputMode === 'input' && (
+        <div className="flex items-center gap-2 p-2 bg-muted/30 border border-border/60 rounded-lg">
+          <Link className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <Input
+            type="url"
+            placeholder="粘贴微信文章链接..."
+            className="h-8 text-xs bg-background border-0 focus-visible:ring-1"
+            value={wechatUrl}
+            onChange={(e) => setWechatUrl(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && parseWechatArticle()}
+          />
+          <Button
+            size="sm"
+            className="h-7 px-3 text-[11px]"
+            onClick={parseWechatArticle}
+            disabled={isParsingWechat || !wechatUrl.trim()}
+          >
+            {isParsingWechat ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              '解析'
+            )}
+          </Button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowWechatInput(false)
+              setWechatUrl('')
+            }}
+            className="w-6 h-6 rounded-md hover:bg-muted flex items-center justify-center flex-shrink-0 transition-colors"
+          >
+            <X className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
         </div>
       )}
     </div>
